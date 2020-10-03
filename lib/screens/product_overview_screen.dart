@@ -11,7 +11,7 @@ import '../widgets/gride_item.dart';
 enum FilterOption { isFavorite, isAll }
 
 class ProductOverviewScreen extends StatefulWidget {
-  static const String routeName = '/';
+  static const String routeName = '/product_overview';
 
   @override
   _ProductOverviewScreenState createState() => _ProductOverviewScreenState();

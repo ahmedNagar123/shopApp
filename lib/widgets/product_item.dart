@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/provider/auth.dart';
 
 import '../provider/cart.dart';
 import '../provider/product.dart';
@@ -10,19 +11,24 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(ProductDetailsScreen.routeName,
-                arguments: product.id);
-          },
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
-          ),
-        ),
+            onTap: () {
+              Navigator.of(context).pushNamed(ProductDetailsScreen.routeName,
+                  arguments: product.id);
+            },
+            child: Hero(
+              tag: product.id,
+              child: FadeInImage(
+                placeholder:
+                    AssetImage('assets/images/product-placeholder.png'),
+                image: NetworkImage(product.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            )),
         footer: GridTileBar(
             title: Text(
               product.title,
@@ -35,7 +41,10 @@ class ProductItem extends StatelessWidget {
                 icon: Icon(product.isFavorite
                     ? Icons.favorite
                     : Icons.favorite_border),
-                onPressed: () => product.isToggle(product.id),
+                onPressed: () => product.isToggle(
+                  auth.token,
+                  auth.userId,
+                ),
               ),
             ),
             trailing: IconButton(

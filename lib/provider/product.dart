@@ -25,15 +25,16 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
-  void isToggle(String id) async {
+  void isToggle(String authToken, String user) async {
     final old = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
     try {
-      final url = 'https://shopapp-12be9.firebaseio.com/$id.json';
-      final response = await http.patch(
+      final url =
+          'https://shopapp-12be9.firebaseio.com/userFavorites/$user/$id.json?auth=$authToken';
+      final response = await http.put(
         url,
-        body: jsonEncode({'isFavorite': isFavorite}),
+        body: jsonEncode(isFavorite),
       );
       if (response.statusCode >= 400) {
         _toggle(old);

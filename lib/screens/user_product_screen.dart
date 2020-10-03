@@ -11,12 +11,12 @@ class UserProductScreen extends StatelessWidget {
 
   Future<void> refreshData(BuildContext context) async {
     await Provider.of<ProductsProvider>(context, listen: false)
-        .fetchAndSetProducts();
+        .fetchAndSetProducts(true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<ProductsProvider>(context);
+    // final productsData = Provider.of<ProductsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -30,18 +30,28 @@ class UserProductScreen extends StatelessWidget {
         title: Text('Your products'),
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => refreshData(context),
-        child: ListView.builder(
-          itemBuilder: (ctx, index) => ProductUser(
-            id: productsData.getItem[index].id,
-            title: productsData.getItem[index].title,
-            imageUrl: productsData.getItem[index].imageUrl,
-            description: productsData.getItem[index].description,
-            price: productsData.getItem[index].price,
-          ),
-          itemCount: productsData.itemLength(),
-        ),
+      body: FutureBuilder(
+        future: refreshData(context),
+        builder: (ctx, snapShot) =>
+            snapShot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => refreshData(context),
+                    child: Consumer<ProductsProvider>(
+                      builder: (ctx, productsData, _) => ListView.builder(
+                        itemBuilder: (ctx, index) => ProductUser(
+                          id: productsData.getItem[index].id,
+                          title: productsData.getItem[index].title,
+                          imageUrl: productsData.getItem[index].imageUrl,
+                          description: productsData.getItem[index].description,
+                          price: productsData.getItem[index].price,
+                        ),
+                        itemCount: productsData.itemLength(),
+                      ),
+                    ),
+                  ),
       ),
     );
   }
